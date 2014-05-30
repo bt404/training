@@ -30,13 +30,14 @@ CLIENTS = {
     "8.14.1.4": "Jerry"
 }
 VIEWS = ("question", "topic", "blog", "comment", "space")
-
+PAGE_NUM = 25   # 设置每个view下的page数量为25
+PAGES = []
 
 def producer(num):
     if not os.path.exists('data'):
         os.mkdir('data')
     with open('data/access.log', 'w+') as log:
-        for i in range(num):
+        for i in xrange(num):
             time = generate_time()
             url = generate_url()
             client = generate_client()
@@ -56,7 +57,11 @@ def generate_time():
 
 
 def generate_url():
-    page = random.randint(100, 999)
+    if len(PAGES) < PAGE_NUM:
+        page = random.randint(100, 999)
+        PAGES.append(page)
+    else:
+        page = random.choice(PAGES)
     view = random.choice(VIEWS)
     return '/'.join(['', view, str(page)])
 
@@ -78,8 +83,8 @@ def generate_level():
 
 
 def response_time():
-    resp_time = random.randint(1, 600)
-    return str(resp_time)
+    resp_time = "{0}ms".format(str(random.randint(1, 600)))
+    return resp_time
 
 
 def concat(level, time, status, method, url, client, resp_time):
