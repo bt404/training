@@ -33,7 +33,7 @@ VIEWS = ("question", "topic", "blog", "comment", "space")
 PAGE_NUM = 25   # 设置每个view下的page数量为25
 PAGES = []
 
-def producer(num):
+def producer(num=2000):
     if not os.path.exists('data'):
         os.mkdir('data')
     with open('data/access.log', 'w+') as log:
@@ -93,10 +93,10 @@ def concat(level, time, status, method, url, client, resp_time):
 
 
 if __name__ == "__main__":
-    if not len(sys.argv)-1:
-        sys.exit("No arg")
-    try:
-        num = int(sys.argv[1])
-    except:
-        sys.exit("Invalid arg")
+    num = 2000
+    if len(sys.argv)-1:
+        try:
+            num = int(sys.argv[1])
+        except:
+            sys.exit("Invalid arg")
     producer(num)
