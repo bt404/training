@@ -11,7 +11,9 @@ import time
 import os
 import re
 
+
 PATTERN = r'(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})]\s([A-Za-z]+)\s.+(/[a-z]+/\d{3})\s(\d+\.\d+\.\d+\.\d+)'
+
 
 def line_parser(line):
     pattern = re.compile(PATTERN)
@@ -35,18 +37,22 @@ def save_info(file_name):
             result.save()
 
 
-def get_users(days):
+def filter_info(days):
     now = datetime.now()
     cond_time = now-timedelta(days)
     cond = {}
     cond["$and"] = [{"time": {"$gt": cond_time}}, {"time": {"$lt": now}}]
-    #print result.count()
     result = Record.aggregate([
         {"$match": cond},
         # ip和view为组合key分组
         {"$group": {"_id": {"ip": "$ip", "view": "$view"}, "num": {"$sum": 1}}},
         {"$sort": {"num": -1}}
     ])["result"]
+    return result
+
+
+def get_users(days):
+    result = filter_info(days)
     ret = []
     users = {}      # 缓存ip和view的对应关系
     for record in result:
@@ -59,23 +65,14 @@ def get_users(days):
         else:
             users[ip] = view
     ret = list(set(ret))        # 删除重复用户
+    print ret
 
 
 def get_views(days):
-    now = datetime.now()
-    cond_time = now-timedelta(days)
-    cond = {}
-    cond["$and"] = [{"time": {"$gt": cond_time}}, {"time": {"$lt": now}}]
-    #print result.count()
-    result = Record.aggregate([
-        {"$match": cond},
-        {"$group": {"_id": "$view", "num": {"$sum": 1}}},
-        {"$sort": {"num": -1}}
-    ])
+    result = filter_info(days)
     users = []
     for key, value in result:
         user = {}
-    print result
 
 
 save_info('data/access.log')
