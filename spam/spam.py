@@ -37,23 +37,46 @@ def save_info(file_name):
 
 def get_users():
     now = datetime.now()
-    cond_time = now-timedelta(15)
+    cond_time = now-timedelta(1)
     cond = {}
     cond["$and"] = [{"time": {"$gt": cond_time}}, {"time": {"$lt": now}}]
-    result = Record.findDocs(cond)
     #print result.count()
     result = Record.aggregate([
         {"$match": cond},
-        {"$group": {"_id": {"ip": "$ip", "view": "$view"}, "num": {"$sum": 1}}},
+        {"$group": {"_id": {"ip": "$ip", "view": "$view"}, "num": {"$sum": 1}}},    # ip和view为组合key分组
         {"$sort": {"num": -1}}
-    ])
-    for user, num in result:
-        pass
-    print result
+    ])["result"]
+    ret = []
+    users = {}      # 缓存ip和view的对应关系
+    for record in result:
+        temp = record["_id"]
+        ip = temp["ip"]
+        view = temp["view"]
+        ip_stored = users.get(ip)
+        if ip_stored and not users[ip] == view:
+            ret.append(ip)      # 当一个ip对应两个或以上view时将ip填入ret
+        else:
+            users[ip] = view
+    print ret
+    ret = list(set(ret))        # 删除重复用户
+    print ret 
 
 
 def get_views():
-    pass
+    now = datetime.now()
+    cond_time = now-timedelta(15)
+    cond = {}
+    cond["$and"] = [{"time": {"$gt": cond_time}}, {"time": {"$lt": now}}]
+    #print result.count()
+    result = Record.aggregate([
+        {"$match": cond},
+        {"$group": {"_id": "$view", "num": {"$sum": 1}}},
+        {"$sort": {"num": -1}}
+    ])
+    users = []
+    for key, value in result:
+        user = {}
+    print result
 
 
 save_info('data/access.log')
