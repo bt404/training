@@ -57,9 +57,9 @@ def get_users(days):
             ret.append(ip)      # 当一个ip对应两个或以上view时将ip填入ret
         else:
             users[ip] = view
-    print ret
+    #print ret
     ret = list(set(ret))        # 删除重复用户
-    print ret 
+    #print ret 
 
 
 def get_views():
