@@ -36,7 +36,8 @@ class Crawler(threading.Thread):
                 break
             queue = self.queues[0]
             try:
-                url = queue.get(timeout=10)       # 因为第一级队列只有一个url，所以如果不设置超时，那么第2个及以后的线程将永远阻塞。
+                # 因为第一级队列只有一个url，所以如果不设置超时，那么第2个及以后的线程将永远阻塞。
+                url = queue.get(timeout=10)       
             except:
                 continue
             try:
@@ -46,15 +47,14 @@ class Crawler(threading.Thread):
             parser = GetUrls()
             parser.getURL(html)
             for item in parser.url:
-                if item[:4]!='http':            # 如果href给出的是服务器上的相对地址，那么补全完整url。
+                if item[:4]!='http':        # 如果href给出的是服务器上的相对地址，那么补全完整url。
                     item = 'http://www.dytt8.net'+item
-                if len(self.queues)>1:          # 当仍要进行下一级抓取的时候，才继续添加url。
+                if len(self.queues)>1:      # 当仍要进行下一级抓取的时候，才继续添加url。
                     self.queues[1].put(item)
-            way = self.way+str(self.num)+'.html'  # 下面5行为存储网页数据。
+            way = self.way+str(self.num)+'.html'  # 下面5行为存储网页数据
             self.num += 1
-            file = open(way,'w+')
-            file.write(html)
-            file.close()
+            with open(way, 'w+') as file:
+                file.write(html)
             print self.name+':has crawled '+str(self.num-1)+'.html'
             try:
                 if queue.empty():
