@@ -70,10 +70,21 @@ def get_users(days):
 
 def get_views(days):
     result = filter_info(days)
-    users = []
-    for key, value in result:
-        user = {}
+    ret = []
+    ips = {}      # 缓存ip和view的对应关系
+    for record in result:
+        temp = record["_id"]
+        ip = temp["ip"]
+        view = temp["view"]
+        view_stored = ips.get(view)
+        if view_stored and not ips[view] == ip:
+            ret.append(view)      # 当一个ip对应两个或以上view时将ip填入ret
+        else:
+            ips[view] = ip
+    ret = list(set(ret))        # 删除重复用户
+    print ret
 
 
 save_info('data/access.log')
 get_users(days=1)
+get_views(days=1)
