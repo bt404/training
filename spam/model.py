@@ -68,6 +68,6 @@ class Record(Model):
             "ip"        : "",           # 访问ip
             "name"      : "",           # 用户名称
             "url"       : "",           # 访问页面
-            "time"      : None,           # 访问时间
+            "time"      : None,         # 访问时间
         })
 

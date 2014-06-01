@@ -43,7 +43,8 @@ def get_users(days):
     #print result.count()
     result = Record.aggregate([
         {"$match": cond},
-        {"$group": {"_id": {"ip": "$ip", "view": "$view"}, "num": {"$sum": 1}}},    # ip和view为组合key分组
+        # ip和view为组合key分组
+        {"$group": {"_id": {"ip": "$ip", "view": "$view"}, "num": {"$sum": 1}}},
         {"$sort": {"num": -1}}
     ])["result"]
     ret = []
@@ -57,14 +58,12 @@ def get_users(days):
             ret.append(ip)      # 当一个ip对应两个或以上view时将ip填入ret
         else:
             users[ip] = view
-    #print ret
     ret = list(set(ret))        # 删除重复用户
-    #print ret 
 
 
-def get_views():
+def get_views(days):
     now = datetime.now()
-    cond_time = now-timedelta(15)
+    cond_time = now-timedelta(days)
     cond = {}
     cond["$and"] = [{"time": {"$gt": cond_time}}, {"time": {"$lt": now}}]
     #print result.count()
