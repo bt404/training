@@ -1,5 +1,5 @@
 # -*- coding: utf8 -*-
-# 研一编写的小爬虫
+# crawler written 2 years ago
 
 import os
 import re
@@ -46,11 +46,11 @@ class Crawler(threading.Thread):
             parser = GetUrls()
             parser.getURL(html)
             for item in parser.url:
-                if item[:4]!='http':            # 如果href给出的是服务器上的相对地址，那么补全完整url
+                if item[:4]!='http':            # 如果href给出的是服务器上的相对地址，那么补全完整url。
                     item = 'http://www.dytt8.net'+item
-                if len(self.queues)>1:          # 当仍要进行下一级抓取的时候，才继续添加url
+                if len(self.queues)>1:          # 当仍要进行下一级抓取的时候，才继续添加url。
                     self.queues[1].put(item)
-            way = self.way+str(self.num)+'.html'  # 下面5行为存储网页数据
+            way = self.way+str(self.num)+'.html'  # 下面5行为存储网页数据。
             self.num += 1
             file = open(way,'w+')
             file.write(html)
@@ -58,7 +58,8 @@ class Crawler(threading.Thread):
             print self.name+':has crawled '+str(self.num-1)+'.html'
             try:
                 if queue.empty():
-                    self.queues.remove(queue)   # 考虑到同步问题，可能存在一个线程将queues置空后，其它线程仍执行remove从而产生异常。
+                    # 考虑到同步问题，可能存在一个线程将queues置空后，其它线程仍执行remove从而产生异常。
+                    self.queues.remove(queue)   
             except:
                 break
 
@@ -66,7 +67,7 @@ if __name__ == '__main__':
     threads = []
     url = 'http://www.dytt8.net'
     queues = []
-    for j in range(0, 2):        # 爬n级则设置n个队列，它们存储在queues列表中。
+    for j in range(0, 2):       # 爬n级则设置n个队列，它们存储在queues列表中。
         queues.append(Queue())
     queues[0].put(url)
     for i in range(0, 3):
