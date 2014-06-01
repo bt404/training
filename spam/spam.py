@@ -35,9 +35,9 @@ def save_info(file_name):
             result.save()
 
 
-def get_users():
+def get_users(days):
     now = datetime.now()
-    cond_time = now-timedelta(1)
+    cond_time = now-timedelta(days)
     cond = {}
     cond["$and"] = [{"time": {"$gt": cond_time}}, {"time": {"$lt": now}}]
     #print result.count()
@@ -80,4 +80,4 @@ def get_views():
 
 
 save_info('data/access.log')
-get_users()
+get_users(days=1)
